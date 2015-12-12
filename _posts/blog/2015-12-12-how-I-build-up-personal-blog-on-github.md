@@ -1,14 +1,11 @@
 ﻿---
 layout: post
 title: 我在github上建立个人博客的过程
-description: Github本身就是不错的代码社区，它也提供了一些其他的服务，比如Github Pages，使用它可以很方便的建立自己的独立博客，并且免费。
+description: Github的其他的服务，比如Github Pages，使用它可以很方便的建立自己的独立博客，并且免费。
 category: blog
 ---
 
 
-标签（空格分隔）：github jekyll markdown 
-
----
 
 # 背景
 进一年前其实我就有建立个人博客的想法，那时候看到阮一峰老师的[一篇博文:搭建一个免费的，无限流量的Blog----github Pages和Jekyll入门](http://www.ruanyifeng.com/blog/2012/08/blogging_with_jekyll.html)。当时兴致勃勃的想搞一个自己博客出来，也努力尝试了，只不过当时是在水平有限，相关知识结构短缺，也未能搞出个模样。最终就是照着阮老师的博客搭了一个`你好，世界`的简易页面出来，接着在CSDN上写了一篇博客：[如何使用Jekyll在github上搭建一个blog ](http://blog.csdn.net/wuxianglonghaohao/article/details/42655499)。
