@@ -1,8 +1,8 @@
 ﻿---
-layout: post
-title: 我在github上建立个人博客的过程
-description: Github的其他的服务，比如Github Pages，使用它可以很方便的建立自己的独立博客，并且免费。
-category: blog
+layout:post
+title:我在github上建立个人博客的过程
+description:Github的其他的服务，比如Github Pages，使用它可以很方便的建立自己的独立博客，并且免费。
+category:blog
 ---
 
 
