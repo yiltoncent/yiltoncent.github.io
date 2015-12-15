@@ -1,4 +1,4 @@
-﻿---
+---
 layout: post
 title:  一个4KB的目录最多可以包含多少各文件？
 description: 计算的结果是339个。
