@@ -44,6 +44,7 @@ do
 done
 ```
 新建一个空目录，如下操作
+
 ```
 yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ mkdir test
 yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ls
@@ -96,6 +97,7 @@ yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ls test/
 
 ## 未解之谜
 检查本机的`/usr/include/i386-linux-gnu/bits/dirent.h`目录项结构体，具体内容如下。
+
 ```
 struct dirent
   {
@@ -112,6 +114,7 @@ struct dirent
   };
 ```
 我编了小程序以确定`struct dirent`的大小：
+
 ```
 #include <dirent.h>
 #include <stdio.h>
@@ -123,6 +126,7 @@ int main(void)
 }
 ```
 编译运行的结果：
+
 ```
 yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ gcc -o dirent.o dirent.c 
 yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ./dirent.o 
