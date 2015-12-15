@@ -20,6 +20,7 @@ category:    blog
 
 ## 检验计算
 我写了一个脚本验证：
+
 ```
 #! /bin/bash
 
@@ -90,6 +91,7 @@ yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ls test/
 07  0g  0p  0y  17  1g  1p  1y  27  2g  2p  2y  37  3g  3p  3y  47  4g  4p  4y  57  5g  5p  5y  67  6g  6p  6y  77  7g  7p  7y  87  8g  8p  8y  97
 08  0h  0q  0z  18  1h  1q  1z  28  2h  2q  2z  38  3h  3q  3z  48  4h  4q  4z  58  5h  5q  5z  68  6h  6q  6z  78  7h  7q  7z  88  8h  8q  8z  98
 ```
+
 测试的结果确实与计算结果一致。
 
 ## 未解之谜
