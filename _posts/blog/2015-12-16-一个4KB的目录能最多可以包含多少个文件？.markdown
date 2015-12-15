@@ -1,0 +1,135 @@
+﻿---
+layout: post
+title:  一个4KB的目录最多可以包含多少各文件？
+description: 计算的结果是339个。
+category:    blog
+---
+
+---
+
+## 新建目录也有大小
+我们知道，在linux中一个新建的目录也会占用一个block大小的空间。一般EXT3的block大小为4KB。我们新建一个目录，验证一下：
+![2015-12-15 23-08-19屏幕截图.png-28.9kB][1]
+
+在linux中，目录其实也是一种文件，只不过相对于普通文件，它比较特殊，它存储的是一些目录项（dirent），每个目录项，由两部分组成：所包含文件的文件名，以及该文件名对应的inode号码。。可以参考<[Linux文件存储结构，包括目录项、inode、数据块](http://c.biancheng.net/cpp/html/2780.html)>和<[linux下普通文件和目录文件区别 ](http://blog.csdn.net/mrjy1475726263/article/details/34436769)>，获得感性认识。
+
+## 目录项结构体
+引用[The Second Extended File System](http://www.nongnu.org/ext2-doc/ext2.html#IFDIR-NAME-LEN)的一张图来说明目录项的结构体。
+![2015-12-16 00-47-29屏幕截图.png-14.4kB][2]
+按照上面这张图，结构体前四项之和为8，又因为`name`至少有一个字符，而目录项又要求4字节对齐，所以一个目录项最小为12。可以存储文件记录的个数为4096/12 = 431...4。去掉新建目录时候默认建立的`.`和`..`目录，可以新建的文件个数为339个。
+
+## 检验计算
+我写了一个脚本验证：
+```
+#! /bin/bash
+
+if [ -d $1 ]; then
+        cd $1
+fi
+
+chrs="0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z"
+count=0
+
+for x in $chrs
+do
+        for y in $chrs
+        do
+                let count=count+1
+                if [ $count -gt $2 ]; then
+                        exit
+                fi
+                touch $x$y
+        done
+done
+```
+新建一个空目录，如下操作
+```
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ mkdir test
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ls
+dirent.c  dirent.o  test  touchfile.sh
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ./touchfile.sh test/ 339
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ls -l
+总用量 20
+-rw-rw-r-- 1 yiltoncent yiltoncent  166 12月 16 00:20 dirent.c
+-rwxrwxr-x 1 yiltoncent yiltoncent 7340 12月 16 00:20 dirent.o
+drwxrwxr-x 2 yiltoncent yiltoncent 4096 12月 16 00:54 test
+-rwxrwxr-x 1 yiltoncent yiltoncent  257 12月 16 00:54 touchfile.sh
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ls -s
+总用量 20
+4 dirent.c  8 dirent.o  4 test  4 touchfile.sh
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ls test/
+00  09  0i  0r  10  19  1i  1r  20  29  2i  2r  30  39  3i  3r  40  49  4i  4r  50  59  5i  5r  60  69  6i  6r  70  79  7i  7r  80  89  8i  8r  90  99
+01  0a  0j  0s  11  1a  1j  1s  21  2a  2j  2s  31  3a  3j  3s  41  4a  4j  4s  51  5a  5j  5s  61  6a  6j  6s  71  7a  7j  7s  81  8a  8j  8s  91  9a
+02  0b  0k  0t  12  1b  1k  1t  22  2b  2k  2t  32  3b  3k  3t  42  4b  4k  4t  52  5b  5k  5t  62  6b  6k  6t  72  7b  7k  7t  82  8b  8k  8t  92  9b
+03  0c  0l  0u  13  1c  1l  1u  23  2c  2l  2u  33  3c  3l  3u  43  4c  4l  4u  53  5c  5l  5u  63  6c  6l  6u  73  7c  7l  7u  83  8c  8l  8u  93  9c
+04  0d  0m  0v  14  1d  1m  1v  24  2d  2m  2v  34  3d  3m  3v  44  4d  4m  4v  54  5d  5m  5v  64  6d  6m  6v  74  7d  7m  7v  84  8d  8m  8v  94  9d
+05  0e  0n  0w  15  1e  1n  1w  25  2e  2n  2w  35  3e  3n  3w  45  4e  4n  4w  55  5e  5n  5w  65  6e  6n  6w  75  7e  7n  7w  85  8e  8n  8w  95  9e
+06  0f  0o  0x  16  1f  1o  1x  26  2f  2o  2x  36  3f  3o  3x  46  4f  4o  4x  56  5f  5o  5x  66  6f  6o  6x  76  7f  7o  7x  86  8f  8o  8x  96
+07  0g  0p  0y  17  1g  1p  1y  27  2g  2p  2y  37  3g  3p  3y  47  4g  4p  4y  57  5g  5p  5y  67  6g  6p  6y  77  7g  7p  7y  87  8g  8p  8y  97
+08  0h  0q  0z  18  1h  1q  1z  28  2h  2q  2z  38  3h  3q  3z  48  4h  4q  4z  58  5h  5q  5z  68  6h  6q  6z  78  7h  7q  7z  88  8h  8q  8z  98
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ rm -r test/
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ mkdir test
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ./touchfile.sh test/ 340
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ls -l
+总用量 28
+-rw-rw-r-- 1 yiltoncent yiltoncent   166 12月 16 00:20 dirent.c
+-rwxrwxr-x 1 yiltoncent yiltoncent  7340 12月 16 00:20 dirent.o
+drwxrwxr-x 2 yiltoncent yiltoncent 12288 12月 16 00:55 test
+-rwxrwxr-x 1 yiltoncent yiltoncent   257 12月 16 00:54 touchfile.sh
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ls -s
+总用量 28
+ 4 dirent.c   8 dirent.o  12 test   4 touchfile.sh
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ls test/
+00  09  0i  0r  10  19  1i  1r  20  29  2i  2r  30  39  3i  3r  40  49  4i  4r  50  59  5i  5r  60  69  6i  6r  70  79  7i  7r  80  89  8i  8r  90  99
+01  0a  0j  0s  11  1a  1j  1s  21  2a  2j  2s  31  3a  3j  3s  41  4a  4j  4s  51  5a  5j  5s  61  6a  6j  6s  71  7a  7j  7s  81  8a  8j  8s  91  9a
+02  0b  0k  0t  12  1b  1k  1t  22  2b  2k  2t  32  3b  3k  3t  42  4b  4k  4t  52  5b  5k  5t  62  6b  6k  6t  72  7b  7k  7t  82  8b  8k  8t  92  9b
+03  0c  0l  0u  13  1c  1l  1u  23  2c  2l  2u  33  3c  3l  3u  43  4c  4l  4u  53  5c  5l  5u  63  6c  6l  6u  73  7c  7l  7u  83  8c  8l  8u  93  9c
+04  0d  0m  0v  14  1d  1m  1v  24  2d  2m  2v  34  3d  3m  3v  44  4d  4m  4v  54  5d  5m  5v  64  6d  6m  6v  74  7d  7m  7v  84  8d  8m  8v  94  9d
+05  0e  0n  0w  15  1e  1n  1w  25  2e  2n  2w  35  3e  3n  3w  45  4e  4n  4w  55  5e  5n  5w  65  6e  6n  6w  75  7e  7n  7w  85  8e  8n  8w  95  9e
+06  0f  0o  0x  16  1f  1o  1x  26  2f  2o  2x  36  3f  3o  3x  46  4f  4o  4x  56  5f  5o  5x  66  6f  6o  6x  76  7f  7o  7x  86  8f  8o  8x  96  9f
+07  0g  0p  0y  17  1g  1p  1y  27  2g  2p  2y  37  3g  3p  3y  47  4g  4p  4y  57  5g  5p  5y  67  6g  6p  6y  77  7g  7p  7y  87  8g  8p  8y  97
+08  0h  0q  0z  18  1h  1q  1z  28  2h  2q  2z  38  3h  3q  3z  48  4h  4q  4z  58  5h  5q  5z  68  6h  6q  6z  78  7h  7q  7z  88  8h  8q  8z  98
+```
+测试的结果确实与计算结果一致。
+
+## 未解之谜
+检查本机的`/usr/include/i386-linux-gnu/bits/dirent.h`目录项结构体，具体内容如下。
+```
+struct dirent
+  {
+#ifndef __USE_FILE_OFFSET64
+    __ino_t d_ino;
+    __off_t d_off;
+#else
+    __ino64_t d_ino;
+    __off64_t d_off;
+#endif
+    unsigned short int d_reclen;
+    unsigned char d_type;
+    char d_name[256];           /* We must not include limits.h! */
+  };
+```
+我编了小程序以确定`struct dirent`的大小：
+```
+#include <dirent.h>
+#include <stdio.h>
+
+int main(void)
+{
+	printf("struct dirent length: %d\n",sizeof(struct dirent));
+	return 0;
+}
+```
+编译运行的结果：
+```
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ gcc -o dirent.o dirent.c 
+yiltoncent@yiltoncent-GA-MA785GM-US2H:~/dirtest$ ./dirent.o 
+struct dirent length: 268
+```
+其中`d_name`项的大小为256，而上面的四项的实际大小为4+4+2+1=11，加起来267≠268呀？！这是因为系统4字节对齐所致。
+那么，如果按照上面脚本的做法，生成的文件文件名大小会超过2，那么每个文件的目录项大小就是13，按照四字节对齐就是16字节，最大存储文件记录的个数为4096/16=256。可是实验结果并不支持上述推论。
+**目前尚且不知道原因为何？希望知道的同学能联系我，帮我解惑答疑。**
+
+
+  [1]: http://static.zybuluo.com/yiltoncent/k3691eu5t7n37h281kwtcphg/2015-12-15%2023-08-19%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png
+  [2]: http://static.zybuluo.com/yiltoncent/swnkcq9xgcj700tzbmnaj5il/2015-12-16%2000-47-29%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png
