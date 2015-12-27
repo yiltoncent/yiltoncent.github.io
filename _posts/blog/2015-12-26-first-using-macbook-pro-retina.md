@@ -1,4 +1,4 @@
-﻿.
+
 ---
 layout: post
 title: 初次使用Macbook Pro Retina的感受
