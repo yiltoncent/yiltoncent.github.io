@@ -1,5 +1,4 @@
-﻿
----
+﻿---
 layout: post
 title: 初次使用Macbook Pro Retina的感受
 description: 终于拥有自己喜欢的苹果笔记本了，简直就是艺术品，摸着就喜欢
